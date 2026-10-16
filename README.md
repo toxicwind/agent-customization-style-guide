@@ -162,11 +162,20 @@ Avoid:
 Every change must pass all gates before merge. Run from repo root:
 
 ```bash
-node bin/validate.js
+node bin/validate.js        # convention gate: frontmatter, ASCII/LF, SDD trio
+bash bin/r503-forge.sh .    # R-503 autonomous scan (pattern-forge audit / ast-grep)
 ```
 
 `bin/validate.js` is the canonical proof command of the TASK phase
-(`.github/prompts/task.prompt.md`). A change is not done until the gate exits 0.
+(`.github/prompts/task.prompt.md`). A change is not done until both gates exit 0.
+
+**R-503 autonomous enforcement** (`bin/r503-forge.sh`): runs `forge audit
+--rule bin/sg/r503.<lang>.yml` (pattern-forge's ast-grep verifier) per language
+-- ts/js, python, bash, json, yaml -- against the repo tree. Any hardcoded
+`github.com/<owner>/<repo>` URL in code or config is reported as evidence
+(file:line + text) and the gate exits 1. Not scanned: `.md` (self-links are
+sanctioned by R-503's own-reference exception) and `.gitmodules` (the
+sanctioned registry).
 
 ## SDD workflow
 

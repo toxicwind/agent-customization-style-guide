@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// agent-customization-style-guide gate - the machine proof command of the TASK phase.
+// <GUIDE_NAME> gate - the machine proof command of the TASK phase.
 // Zero findings = exit 0. Any finding = exit 1 with a report.
 // Generic by design: checks the guide convention itself. Specialize per guide.
 'use strict';
@@ -30,11 +30,14 @@ else {
   if (!/Provenance/i.test(t)) add(readme, 'README does not mention Provenance (required per-rule)');
 }
 
-// 2. Ids are unique and sorted within their README (renumbering guard is via git history; this checks formatting).
+// 2. Rule ids: each id is DEFINED (as a **R-NNN** header) exactly once;
+//    plain-text mentions (references) are fine.
 if (fs.existsSync(readme)) {
-  const ids = (fs.readFileSync(readme, 'utf8').match(/R-\d{3}/g) || []);
-  const dup = ids.filter((v, i) => ids.indexOf(v) !== i);
-  if (dup.length) add(readme, `duplicate rule ids: ${[...new Set(dup)].join(', ')}`);
+  const t = fs.readFileSync(readme, 'utf8');
+  const defs = (t.match(/\*\*R-\d{3}\.?\*\*/g) || []);
+  const dup = defs.filter((v, i) => defs.indexOf(v) !== i);
+  if (dup.length) add(readme, `duplicate rule definitions: ${[...new Set(dup)].join(', ')}`);
+  if (defs.length === 0) add(readme, 'no rule definitions (**R-NNN** headers) found');
 }
 
 // 3. LF-only: CR bytes are forbidden in tracked text (Arch main; CRLF leaks
