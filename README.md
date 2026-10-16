@@ -153,6 +153,10 @@ Avoid:
 
 *Why.* Broken frontmatter fails silently at load time. `bin/validate.js` in this repo parses frontmatter, checks ASCII/LF, and verifies the SDD trio exists -- the TASK phase proof command. (Provenance: estate-original; grasp-hub validator pattern.)
 
+**R-503.** Documentation references sibling repos by their local path (`ranch/<name>`), never by a hardcoded `github.com` URL. Resolve to a URL only at runtime: `git -C <path> remote get-url origin`. Within one repo, use relative links.
+
+*Why.* Hardcoded cross-repo URLs rot on rename/migrate and duplicate what git already knows (each checkout's origin is the single source of truth -- the ranch `.gitmodules` doctrine). Relative links work on GitHub, in VS Code, and in every agent harness; runtime derivation survives repo renames for free. The only acceptable hardcoded URL is a repo referencing itself. (Provenance: estate-original; ranch .gitmodules header comment.)
+
 ## Gates
 
 Every change must pass all gates before merge. Run from repo root:
