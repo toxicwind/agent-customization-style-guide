@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# agent-customization-style-guide — primary operation: enforce R-503 (no
+# hardcoded cross-repo GitHub URLs) via the pattern-forge audit, OR serve the
+# guide's canonical convention gate.
+#
+# Usage:
+#   bin/run check            # convention gate: node bin/validate.js (canonical)
+#   bin/run forge <dir>      # R-503 pattern-forge audit over <dir>
+#   bin/run                  # same as `check`
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+case "${1:-check}" in
+  check)
+    exec node bin/validate.js
+    ;;
+  forge)
+    shift
+    ROOT="${1:?usage: bin/run forge <root-dir> [globs...]}"
+    shift || true
+    exec bash bin/r503-forge.sh "$ROOT" "$@"
+    ;;
+  *)
+    echo "usage: bin/run [check|forge <root-dir>]"; exit 2
+    ;;
+esac

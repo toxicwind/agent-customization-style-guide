@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# agent-customization-style-guide — self-test gate (PASS/FAIL).
+# Canonical machine gate (TASK-phase proof command): node bin/validate.js
+# checks frontmatter validity, ASCII/LF, and the SDD prompt trio. Zero findings
+# = PASS.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+echo "== agent-customization-style-guide check: start =="
+[ -f bin/validate.js ] || { echo "FAIL: bin/validate.js missing"; exit 1; }
+command -v node >/dev/null 2>&1 || { echo "FAIL: node not found"; exit 1; }
+
+set +e
+out="$(node bin/validate.js 2>&1)"
+rc=$?
+set -e
+echo "$out"
+
+[ "$rc" -eq 0 ] || { echo "FAIL: validate.js rc=$rc"; exit 1; }
+echo "$out" | grep -qiE '0 findings|OK' || { echo "FAIL: no clean-gate marker"; exit 1; }
+
+echo "== agent-customization-style-guide check: PASS =="
+exit 0
